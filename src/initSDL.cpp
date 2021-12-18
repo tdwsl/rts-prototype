@@ -25,7 +25,7 @@ void initSDL() {
 
 	assert(win = SDL_CreateWindow("Stipula RTS",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		640, 480, SDL_WINDOW_SHOWN));
+		640, 480, SDL_WINDOW_RESIZABLE));
 
 	assert(renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE));
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xff);

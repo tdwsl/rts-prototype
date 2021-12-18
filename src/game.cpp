@@ -9,6 +9,7 @@
 
 Game::Game(const char *filename) {
 	level.load(filename);
+	sidebar.rebuild();
 }
 
 void Game::update(int diff) {
@@ -34,9 +35,10 @@ void Game::draw() {
 
 	drawText(0, 0, "Hello, world!");
 
-	SDL_Rect src = (SDL_Rect){0, 0, 80, 240};
+	/*SDL_Rect src = (SDL_Rect){0, 0, 80, 240};
 	SDL_Rect dst = (SDL_Rect){240, 0, 80, 240};
-	SDL_RenderCopy(renderer, texture::ui, &src, &dst);
+	SDL_RenderCopy(renderer, texture::ui, &src, &dst);*/
+	sidebar.draw();
 
 	updateDisplay();
 }

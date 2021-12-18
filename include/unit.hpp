@@ -5,6 +5,14 @@
 
 #include "level.hpp"
 
+enum {
+	UNITTYPE_SOLDIER=0,
+	UNITTYPE_DIGGER,
+	UNITTYPE_HARVESTER,
+};
+
+extern const char *unitNames[];
+
 class Level;
 
 class Unit {

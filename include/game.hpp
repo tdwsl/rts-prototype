@@ -3,12 +3,14 @@
 
 #include <SDL2/SDL.h>
 #include "level.hpp"
+#include "ui.hpp"
 
 class Game {
 	float cameraX=0, cameraY=0;
 	float cameraXV=0, cameraYV=0;
 	Level level;
 	bool quit=false;
+	Sidebar sidebar;
 
 	void draw();
 	void update(int diff);

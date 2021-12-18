@@ -5,6 +5,8 @@
 #include "initSDL.hpp"
 #include "map.hpp"
 
+#define TILESET_W 4
+
 void Map::load(const char *filename) {
 	FILE *fp = fopen(filename, "r");
 	assert(fp);

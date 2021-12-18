@@ -4,6 +4,7 @@
 #include "drawText.hpp"
 
 #define TABSZ 4
+#define FONT_W 32
 
 void drawText(int x, int y, const char *text) {
 	int cx = 0, cy = 0;

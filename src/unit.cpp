@@ -6,6 +6,14 @@
 #include "level.hpp"
 #include "unit.hpp"
 
+#define UNITS_W 8
+
+const char *unitNames[] = {
+	"Soldier",
+	"Digger",
+	"Harvester",
+};
+
 struct stat {
 	float hp, range, speed, damage, regen;
 };
