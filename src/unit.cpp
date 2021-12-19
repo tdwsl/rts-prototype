@@ -63,7 +63,7 @@ void Unit::navTo(int tx, int ty) {
 	if(fixed)
 		return;
 
-	Map pmap = level->map.generatePathmap(x, y, tx, ty);
+	Map pmap = level->generatePathmap(x, y, tx, ty);
 
 	int xm, ym;
 	int i = pmap.getTile(tx, ty);

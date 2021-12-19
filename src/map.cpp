@@ -78,7 +78,7 @@ Map::~Map() {
 		free(arr);
 }
 
-bool tileBlocks(int t) {
+bool Map::tileBlocks(int t) {
 	switch(t) {
 		case 0:
 		case 1:
@@ -92,33 +92,6 @@ bool tileBlocks(int t) {
 
 bool Map::blocks(int x, int y) {
 	return tileBlocks(getTile(x, y));
-}
-
-Map Map::generatePathmap(int x1, int y1, int x2, int y2) {
-	Map m;
-	m.init(w, h, -1);
-
-	for(int i = 0; i < w*h; i++)
-		m.arr[i] = tileBlocks(arr[i])*-1;
-	m.setTile(x1, y1, 1);
-
-	for(int i = 1; m.getTile(x2, y2) == 0; i++)
-		for(int j = 0; j < w*h; j++) {
-			if(m.arr[j] != i)
-				continue;
-
-			int x = j%w, y = j/w;
-			for(int xm = -1; xm <= 1; xm++)
-				for(int ym = -1; ym <= 1; ym++) {
-					if(m.getTile(x+xm, y+ym) != 0)
-						continue;
-					/*if(xm && ym)
-						continue;*/
-					m.setTile(x+xm, y+ym, i+1);
-				}
-		}
-
-	return m;
 }
 
 void Map::print() {

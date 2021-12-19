@@ -1,9 +1,12 @@
 #ifndef MAP_H
 #define MAP_H
 
+class Level;
+
 class Map {
 	int *arr = 0;
 	void print();
+	bool tileBlocks(int t);
 public:
 	int w, h;
 
@@ -14,8 +17,9 @@ public:
 	void draw(int x, int y);
 	int getTile(int x, int y);
 	void setTile(int x, int y, int);
-	Map generatePathmap(int x1, int y1, int x2, int y2);
 	bool blocks(int x, int y);
+
+	friend class Level;
 };
 
 #endif

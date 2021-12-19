@@ -17,11 +17,12 @@ public:
 
 class Sidebar {
 	std::vector<Category> categories;
-	int page=0;
-	int cindex=2;
+	int page;
+	int cindex;
 	void addCategory(const char *name, int icon);
 	int actionAt(int x, int y);
 public:
+	Sidebar();
 	void rebuild();
 	void draw();
 	void click();

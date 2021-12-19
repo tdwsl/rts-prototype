@@ -37,6 +37,11 @@ int Category::size() {
 	return (int)types.size();
 }
 
+Sidebar::Sidebar() {
+	cindex = 0;
+	page = 0;
+}
+
 void Sidebar::addCategory(const char *name, int icon) {
 	Category c(name, icon);
 	categories.push_back(c);
