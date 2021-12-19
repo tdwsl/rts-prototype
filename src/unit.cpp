@@ -14,16 +14,13 @@ const char *unitNames[] = {
 	"Harvester",
 };
 
-struct stat {
-	float hp, range, speed, damage, regen;
-};
-
-const stat stats[] = {
-	{10, 15, 0.002, 2.5, 0},
-	{20, 10, 0.001, 7, 0.1},
-};
-
 Unit::Unit(Level *level, int x, int y, int type, int team) {
+	cooldown = 0;
+	step = 0;
+	d = 0;
+	pd = 0;
+	targetMode = 0;
+
 	Unit::team = team;
 	Unit::type = type;
 	Unit::level = level;
@@ -32,8 +29,25 @@ Unit::Unit(Level *level, int x, int y, int type, int team) {
 	px = x;
 	py = y;
 
-	const stat &t = stats[type];
-	hp = t.hp;
+	fixed = false;
+	regen = 0;
+
+	switch(type) {
+		case UNITTYPE_SOLDIER:
+			hp = 10;
+			speed = 0.002;
+			break;
+		case UNITTYPE_DIGGER:
+			hp = 15;
+			speed = 0.0015;
+			break;
+		case UNITTYPE_HARVESTER:
+			hp = 11;
+			speed = 0.003;
+			break;
+	}
+
+	maxhp = hp;
 }
 
 bool Unit::moving() {
@@ -44,6 +58,8 @@ bool Unit::moving() {
 
 void Unit::navTo(int tx, int ty) {
 	if(moving())
+		return;
+	if(fixed)
 		return;
 
 	Map pmap = level->map.generatePathmap(x, y, tx, ty);
@@ -58,7 +74,7 @@ void Unit::navTo(int tx, int ty) {
 
 		for(int sxm = -1; sxm <= 1 && !found; sxm++)
 			for(int sym = -1; sym <= 1 && !found; sym++) {
-				if(!sxm || !sym)
+				if(sxm && sym)
 					continue;
 				if(pmap.getTile(cx+sxm, cy+sym) == i-1) {
 					found = true;
@@ -90,6 +106,8 @@ void Unit::move(int x, int y) {
 		return;
 	if(!x && !y)
 		return;
+	if(fixed)
+		return;
 	
 	int dx = Unit::x+x, dy = Unit::y+y;
 	if(level->map.blocks(dx, dy))
@@ -97,13 +115,20 @@ void Unit::move(int x, int y) {
 	if(level->unitAt(dx, dy))
 		return;
 
-	int sd = 0;
-	for(int sx = -1; sx <= 1; sx++)
-		for(int sy = -1; sy <= 1; sy++) {
-			if(sx == x*-1 && sy == y*-1)
-				d = (sd+1)%8;
-			sd++;
-		}
+	d = 0;
+	const int dirs[] = {
+		0, -1,
+		1, -1,
+		1, 0,
+		1, 1,
+		0, 1,
+		-1, 1,
+		-1, 0,
+		-1, -1,
+	};
+	for(int i = 0; i < 8 && !d; i++)
+		if(x == dirs[i*2] && y == dirs[i*2+1])
+			d = i;
 
 	Unit::x = dx;
 	Unit::y = dy;
@@ -111,16 +136,14 @@ void Unit::move(int x, int y) {
 }
 
 void Unit::update(int diff) {
-	const stat &t = stats[type];
-
-	if(hp < t.hp) {
-		hp += t.regen*diff;
-		if(hp > t.hp)
-			hp = t.hp;
+	if(hp < maxhp) {
+		hp += regen*diff;
+		if(hp > maxhp)
+			hp = maxhp;
 	}
 
 	if(moving()) {
-		step += t.speed*diff;
+		step += speed*diff;
 		if(step >= 1.0) {
 			step = 0;
 			px = x;
@@ -128,6 +151,22 @@ void Unit::update(int diff) {
 			pd = d;
 		}
 	}
+	else if(targetMode == 1) {
+		if(px == targetX && py == targetY)
+			targetMode = 0;
+		else
+			navTo(targetX, targetY);
+	}
+}
+
+SDL_Rect Unit::destRect(int x, int y) {
+	int xd = Unit::x-px, yd = Unit::y-py;
+	SDL_Rect dst = (SDL_Rect) {
+		px*24 + xd*(int)(24*step) + x,
+		py*24 + yd*(int)(24*step) + y,
+		24, 24
+	};
+	return dst;
 }
 
 void Unit::draw(int x, int y) {
@@ -143,18 +182,63 @@ void Unit::draw(int x, int y) {
 	float am = step*1.5;
 	if(am > 1)
 		am = 1;
-	float a = pa+(ca-pa)*am;
+	float ad = (ca-pa);
+	if(ad > PI)
+		ad -= PI*2;
+	if(ad < -PI)
+		ad += PI*2;
+	float a = pa + ad*am;
 	a = (a/PI)*180;
 
 	SDL_Rect src = (SDL_Rect){(t%UNITS_W)*32, (t/UNITS_W)*32, 32, 32};
-	int xd = Unit::x-px, yd = Unit::y-py;
-	SDL_Rect dst = (SDL_Rect) {
-		px*24 + xd*(int)(24*step) + x,
-		py*24 + yd*(int)(24*step) + y,
-		24, 24
-	};
+	SDL_Rect dst = destRect(x, y);
 	SDL_Point p = (SDL_Point){12, 12};
 
 	SDL_RenderCopyEx(renderer, texture::units, &src, &dst,
 			a, &p, SDL_FLIP_NONE);
+}
+
+void Unit::drawUI_top(int x, int y) {
+	SDL_Rect src = (SDL_Rect){
+		24*(int)((SDL_GetTicks()/200)%2), 240,
+		24, 24
+	};
+	SDL_Rect dst = destRect(x, y);
+	SDL_RenderCopy(renderer, texture::ui, &src, &dst);
+
+	if(targetMode == 2) {
+		src.x = 48;
+		dst = (SDL_Rect){x+targetX*24, y+targetY*24, 24, 24};
+		SDL_RenderCopy(renderer, texture::ui, &src, &dst);
+	}
+}
+
+void Unit::drawUI_bottom(int x, int y) {
+	if(!targetMode)
+		return;
+
+	int tx = targetX, ty = targetY;
+
+	SDL_Rect dst1 = destRect(x, y);
+	SDL_Rect dst2 = (SDL_Rect){x+tx*24, y+ty*24, 24, 24};
+
+	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0x88);
+	SDL_RenderDrawLine(renderer, dst1.x+12, dst1.y+12, dst2.x+12, dst2.y+12);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xff);
+
+	if(targetMode == 1) {
+		SDL_Rect src = (SDL_Rect){48, 240, 24, 24};
+		SDL_RenderCopy(renderer, texture::ui, &src, &dst2);
+	}
+}
+
+void Unit::target(int x, int y) {
+	if(level->map.blocks(x, y))
+		return;
+	if(fixed)
+		return;
+
+	targetX = x;
+	targetY = y;
+	targetMode = 1;
 }

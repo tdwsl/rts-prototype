@@ -9,7 +9,7 @@ extern SDL_Window *win;
 void initSDL();
 void endSDL();
 SDL_Texture *loadTexture(const char *filename);
-void getMouseXY(int *x, int *y);
+Uint32 getMouseXY(int *x, int *y);
 void updateDisplay();
 
 #endif

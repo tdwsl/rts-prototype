@@ -8,6 +8,7 @@
 #include "game.hpp"
 
 Game::Game(const char *filename) {
+	unit = 0;
 	level.load(filename);
 	sidebar.rebuild();
 }
@@ -31,9 +32,14 @@ void Game::draw() {
 	SDL_RenderClear(renderer);
 
 	level.map.draw(-cameraX, -cameraY);
+	
+	if(unit)
+		unit->drawUI_bottom(-cameraX, -cameraY);
+
 	level.drawUnits(-cameraX, -cameraY);
 
-	drawText(0, 0, "Hello, world!");
+	if(unit)
+		unit->drawUI_top(-cameraX, -cameraY);
 
 	sidebar.draw();
 	drawCursor();
@@ -79,6 +85,24 @@ void Game::keyUp(SDL_Keycode sym) {
 	}
 }
 
+void Game::click() {
+	int x, y;
+	Uint32 btn = getMouseXY(&x, &y);
+
+	if(x >= 240) {
+		sidebar.click();
+		return;
+	}
+
+	x = (x+cameraX)/24;
+	y = (y+cameraY)/24;
+	if(btn & SDL_BUTTON_LMASK) {
+		unit = level.unitAt(x, y);
+	}
+	else if(unit && (btn & SDL_BUTTON_RMASK))
+		unit->target(x, y);
+}
+
 void Game::run() {
 	int lastUpdate = SDL_GetTicks();
 
@@ -96,7 +120,7 @@ void Game::run() {
 					keyUp(ev.key.keysym.sym);
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-					sidebar.click();
+					click();
 					break;
 			}
 

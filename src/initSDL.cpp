@@ -45,7 +45,9 @@ void initSDL() {
 		SDL_TEXTUREACCESS_TARGET, 320, 240));
 	SDL_SetRenderTarget(renderer, scrbuf);
 
-	SDL_SetCursor(SDL_DISABLE);
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+	SDL_ShowCursor(SDL_DISABLE);
 }
 
 void endSDL() {
@@ -73,14 +75,15 @@ SDL_Rect getScreenRect() {
 	return r;
 }
 
-void getMouseXY(int *x, int *y) {
-	SDL_GetMouseState(x, y);
+Uint32 getMouseXY(int *x, int *y) {
+	Uint32 btn = SDL_GetMouseState(x, y);
 	SDL_Rect r = getScreenRect();
 
 	*x -= r.x;
 	*y -= r.y;
 	*x /= r.w / 320.0;
 	*y /= r.h / 240.0;
+	return btn;
 }
 
 void updateDisplay() {

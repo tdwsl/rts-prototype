@@ -112,8 +112,8 @@ Map Map::generatePathmap(int x1, int y1, int x2, int y2) {
 				for(int ym = -1; ym <= 1; ym++) {
 					if(m.getTile(x+xm, y+ym) != 0)
 						continue;
-					if(xm && ym)
-						continue;
+					/*if(xm && ym)
+						continue;*/
 					m.setTile(x+xm, y+ym, i+1);
 				}
 		}

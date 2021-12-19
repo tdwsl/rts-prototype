@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include "level.hpp"
 #include "ui.hpp"
+#include "unit.hpp"
 
 class Game {
 	float cameraX=0, cameraY=0;
@@ -11,11 +12,13 @@ class Game {
 	Level level;
 	bool quit=false;
 	Sidebar sidebar;
+	Unit *unit;
 
 	void draw();
 	void update(int diff);
 	void keyDown(SDL_Keycode keysym);
 	void keyUp(SDL_Keycode keysym);
+	void click();
 public:
 	Game(const char *filename);
 	void run();
