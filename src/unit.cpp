@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <cstdlib>
 #include <cstdio>
+#include <cmath>
 #include "initSDL.hpp"
 #include "loadTextures.hpp"
 #include "level.hpp"
@@ -179,14 +180,17 @@ void Unit::draw(int x, int y) {
 
 	float ca = (PI/4)*d;
 	float pa = (PI/4)*pd;
-	float am = step*1.5;
+
+	float am = (abs(pd-d)>1) ? step*1.5 : step*2;
 	if(am > 1)
 		am = 1;
+
 	float ad = (ca-pa);
 	if(ad > PI)
 		ad -= PI*2;
 	if(ad < -PI)
 		ad += PI*2;
+
 	float a = pa + ad*am;
 	a = (a/PI)*180;
 

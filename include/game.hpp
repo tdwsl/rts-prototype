@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "level.hpp"
-#include "ui.hpp"
+#include "sidebar.hpp"
 #include "unit.hpp"
 
 class Game {
