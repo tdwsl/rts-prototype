@@ -4,7 +4,7 @@
 #include "unit.hpp"
 #include "map.hpp"
 #include "level.hpp"
-#include "loadTextures.hpp"
+#include "cursor.hpp"
 #include "game.hpp"
 
 Game::Game(const char *filename) {
@@ -35,10 +35,8 @@ void Game::draw() {
 
 	drawText(0, 0, "Hello, world!");
 
-	/*SDL_Rect src = (SDL_Rect){0, 0, 80, 240};
-	SDL_Rect dst = (SDL_Rect){240, 0, 80, 240};
-	SDL_RenderCopy(renderer, texture::ui, &src, &dst);*/
 	sidebar.draw();
+	drawCursor();
 
 	updateDisplay();
 }
@@ -96,6 +94,9 @@ void Game::run() {
 					break;
 				case SDL_KEYUP:
 					keyUp(ev.key.keysym.sym);
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					sidebar.click();
 					break;
 			}
 

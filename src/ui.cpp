@@ -80,6 +80,14 @@ int Sidebar::actionAt(int x, int y) {
 		return ACTION_NEXTPAGE;
 	}
 
+	if(x >= 0 && y>= 84 && y < 84+categories.size()*12
+			&& x < 12) {
+		int i = (y-84) / 12;
+		if(i == cindex)
+			return ACTION_NONE;
+		return ACTION_SELECTCATEGORY+i;
+	}
+
 	return ACTION_NONE;
 }
 
@@ -87,6 +95,27 @@ void Sidebar::draw() {
 	SDL_Rect src = (SDL_Rect){0, 0, 80, 240};
 	SDL_Rect dst = (SDL_Rect){240, 0, 80, 240};
 	SDL_RenderCopy(renderer, texture::ui, &src, &dst);
+
+	for(int i = 0; i < categories.size(); i++) {
+		src = (SDL_Rect) {
+			172-(i==cindex)*12, 12, 12, 12
+		};
+		dst = (SDL_Rect){240, 84+i*12, 12, 12};
+		SDL_RenderCopy(renderer, texture::ui,
+			&src, &dst);
+		categories.at(i).drawIcon(240, 84+i*12);
+	}
+
+	for(int i = 0; i < categories.at(cindex).size(); i++) {
+		int t = categories.at(cindex).at(i);
+		src = (SDL_Rect){80+(t%4)*20, (t/4)*20, 20, 20};
+		dst = (SDL_Rect) {
+			240+16+(i%3)*20, 88+(i/3)*20,
+			20, 20
+		};
+		SDL_RenderCopy(renderer, texture::ui,
+			&src, &dst);
+	}
 
 	int mx, my;
 	getMouseXY(&mx, &my);
@@ -96,10 +125,16 @@ void Sidebar::draw() {
 
 	const char *hovertext;
 	int a = actionAt(mx, my);
-	switch(a) {
+	int ma = a;
+	if(a >= ACTION_SELECTUNIT &&
+			a < ACTION_SELECTUNIT+5)
+		ma = ACTION_SELECTUNIT;
+	if(a >= ACTION_SELECTCATEGORY &&
+			a < ACTION_SELECTCATEGORY+6)
+		ma = ACTION_SELECTCATEGORY;
+	switch(ma) {
 		default:
-			hovertext = "Hello!";
-			break;
+			return;
 		case ACTION_PREVPAGE:
 			hovertext = "previous";
 			break;
@@ -107,11 +142,10 @@ void Sidebar::draw() {
 			hovertext = "next";
 			break;
 		case ACTION_SELECTCATEGORY:
-			hovertext = categories.at(
-					a-ACTION_SELECTCATEGORY).name;
+			hovertext = categories.at(a-ma).name;
 			break;
 		case ACTION_SELECTUNIT:
-			hovertext = unitNames[a-ACTION_SELECTUNIT];
+			hovertext = unitNames[a-ma];
 			break;
 	}
 	drawText(mx+240+12, my, hovertext);
@@ -122,7 +156,15 @@ void Sidebar::click() {
 	getMouseXY(&mx, &my);
 	mx -= 240;
 
-	switch(actionAt(mx, my)) {
+	int a = actionAt(mx, my);
+	int ma = a;
+	if(a >= ACTION_SELECTUNIT && a < ACTION_SELECTUNIT+6)
+		ma = ACTION_SELECTUNIT;
+	if(a >= ACTION_SELECTCATEGORY &&
+			a < ACTION_SELECTCATEGORY+5)
+		ma = ACTION_SELECTCATEGORY;
+
+	switch(ma) {
 		default:
 			break;
 		case ACTION_PREVPAGE:
@@ -130,6 +172,9 @@ void Sidebar::click() {
 			break;
 		case ACTION_NEXTPAGE:
 			page++;
+			break;
+		case ACTION_SELECTCATEGORY:
+			cindex = a-ma;
 			break;
 	}
 }

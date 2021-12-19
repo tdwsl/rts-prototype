@@ -23,16 +23,29 @@ SDL_Texture *loadTexture(const char *filename) {
 void initSDL() {
 	assert(SDL_Init(SDL_INIT_EVERYTHING) >= 0);
 
+	int w = 640, h = 480;
+
+	SDL_DisplayMode dm;
+	SDL_GetDesktopDisplayMode(0, &dm);
+	if(dm.w < w)
+		w = dm.w;
+	if(dm.h < h)
+		h = dm.h;
+
 	assert(win = SDL_CreateWindow("Stipula RTS",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		640, 480, SDL_WINDOW_RESIZABLE));
+		w, h, SDL_WINDOW_RESIZABLE));
 
-	assert(renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE));
+	assert(renderer = SDL_CreateRenderer(win, -1,
+		SDL_RENDERER_SOFTWARE));
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xff);
 
-	assert(scrbuf = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+	assert(scrbuf = SDL_CreateTexture(renderer,
+		SDL_PIXELFORMAT_RGBA8888,
 		SDL_TEXTUREACCESS_TARGET, 320, 240));
 	SDL_SetRenderTarget(renderer, scrbuf);
+
+	SDL_SetCursor(SDL_DISABLE);
 }
 
 void endSDL() {

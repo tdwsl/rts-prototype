@@ -2,12 +2,14 @@
 CC = g++
 OUTPUT = stipula
 
-$(OUTPUT): obj/drawText.o obj/game.o obj/initSDL.o obj/level.o obj/loadTextures.o obj/main.o obj/map.o obj/ui.o obj/unit.o
+$(OUTPUT): obj/cursor.o obj/drawText.o obj/game.o obj/initSDL.o obj/level.o obj/loadTextures.o obj/main.o obj/map.o obj/ui.o obj/unit.o
 	$(CC) obj/* -Iinclude -o $(OUTPUT) -lSDL2
 
+obj/cursor.o: src/cursor.cpp include/initSDL.hpp include/loadTextures.hpp include/cursor.hpp
+	$(CC) -c src/cursor.cpp -Iinclude -o obj/cursor.o
 obj/drawText.o: src/drawText.cpp include/initSDL.hpp include/loadTextures.hpp include/drawText.hpp
 	$(CC) -c src/drawText.cpp -Iinclude -o obj/drawText.o
-obj/game.o: src/game.cpp include/initSDL.hpp include/drawText.hpp include/unit.hpp include/map.hpp include/level.hpp include/loadTextures.hpp include/game.hpp
+obj/game.o: src/game.cpp include/initSDL.hpp include/drawText.hpp include/unit.hpp include/map.hpp include/level.hpp include/cursor.hpp include/game.hpp
 	$(CC) -c src/game.cpp -Iinclude -o obj/game.o
 obj/initSDL.o: src/initSDL.cpp include/initSDL.hpp
 	$(CC) -c src/initSDL.cpp -Iinclude -o obj/initSDL.o
