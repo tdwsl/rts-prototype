@@ -92,8 +92,12 @@ Map Level::generatePathmap(int x1, int y1, int x2, int y2) {
 
 	for(int i = 0; i < m.w*m.h; i++)
 		m.arr[i] = map.tileBlocks(map.arr[i])*-1;
+	if(m.getTile(x2, y2) == -1)
+		return m;
+
 	for(int i = 0; i < units.size(); i++)
 		m.setTile(units.at(i).x, units.at(i).y, -1);
+	m.setTile(x2, y2, 0);
 
 	m.setTile(x1, y1, 1);
 

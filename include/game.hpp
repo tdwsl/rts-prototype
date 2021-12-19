@@ -2,23 +2,31 @@
 #define GAME_H
 
 #include <SDL2/SDL.h>
+#include <vector>
 #include "level.hpp"
 #include "sidebar.hpp"
 #include "unit.hpp"
 
 class Game {
-	float cameraX=0, cameraY=0;
-	float cameraXV=0, cameraYV=0;
+	float cameraX, cameraY;
+	float cameraXV, cameraYV;
+	int oldX, oldY;
+	float oldCamX, oldCamY;
 	Level level;
-	bool quit=false;
+	bool quit;
 	Sidebar sidebar;
-	Unit *unit;
+	std::vector<Unit*> selectedUnits;
+	Uint32 btn;
+	bool drag;
+	bool mousedown;
 
 	void draw();
 	void update(int diff);
 	void keyDown(SDL_Keycode keysym);
 	void keyUp(SDL_Keycode keysym);
 	void click();
+	SDL_Rect getSelectRect();
+	void drawSelectRect();
 public:
 	Game(const char *filename);
 	void run();
