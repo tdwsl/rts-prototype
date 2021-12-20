@@ -8,7 +8,9 @@ namespace texture {
 		*tileset,
 		*units,
 		*font,
-		*ui;
+		*ui,
+		*fixed,
+		*turret;
 };
 
 void loadTextures();

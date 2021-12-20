@@ -52,7 +52,12 @@ void Sidebar::rebuild() {
 	addCategory("Buildings", 0);
 	addCategory("Vehicles", 1);
 	addCategory("Infantry", 2);
-	categories.at(2).add(UNITTYPE_SOLDIER);
+
+	if(team) {
+		if(team->barracks) {
+			categories.at(2).add(UNITTYPE_SOLDIER);
+		}
+	}
 
 	if(cindex >= categories.size())
 		cindex = 0;

@@ -27,6 +27,7 @@ class Game {
 	void click();
 	SDL_Rect getSelectRect();
 	void drawSelectRect();
+	void selectUnits();
 public:
 	Game(const char *filename);
 	void run();

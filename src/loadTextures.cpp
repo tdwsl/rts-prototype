@@ -10,15 +10,21 @@ decltex(tileset);
 decltex(units);
 decltex(font);
 decltex(ui);
+decltex(fixed);
+decltex(turret);
 
 void loadTextures() {
 	loadtex(tileset);
 	loadtex(units);
 	loadtex(font);
 	loadtex(ui);
+	loadtex(fixed);
+	loadtex(turret);
 }
 
 void freeTextures() {
+	freetex(turret);
+	freetex(fixed);
 	freetex(tileset);
 	freetex(units);
 	freetex(font);

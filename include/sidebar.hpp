@@ -2,6 +2,7 @@
 #define SIDEBAR_H
 
 #include <vector>
+#include "team.hpp"
 
 class Category {
 	std::vector<int> types;
@@ -17,6 +18,7 @@ public:
 
 class Sidebar {
 	std::vector<Category> categories;
+	Team *team;
 	int page;
 	int cindex;
 	void addCategory(const char *name, int icon);
@@ -26,6 +28,8 @@ public:
 	void rebuild();
 	void draw();
 	void click();
+
+	friend class Game;
 };
 
 #endif

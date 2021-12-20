@@ -3,12 +3,18 @@
 
 #define PI 3.14159
 
+#include <SDL2/SDL.h>
 #include "level.hpp"
 
 enum {
 	UNITTYPE_SOLDIER=0,
 	UNITTYPE_DIGGER,
 	UNITTYPE_HARVESTER,
+	UNITTYPE_POWERPLANT,
+	UNITTYPE_BARRACKS,
+	UNITTYPE_FACTORY,
+	UNITTYPE_FARM,
+	UNITTYPE_MINE,
 };
 
 extern const char *unitNames[];
@@ -28,10 +34,15 @@ class Unit {
 	bool fixed;
 	int targetX, targetY, targetMode;
 	int power;
-	bool disabled;
+	bool disabled, turret;
+	int graphic;
+	int w, h;
+	int spawnX, spawnY;
+	Unit *targetUnit;
 
 	bool moving();
 	SDL_Rect destRect(int x, int y);
+	void drawFixed(int x, int y);
 public:
 	Unit(Level *level, int x, int y, int type, int team);
 	void move(int x, int y);
@@ -41,6 +52,7 @@ public:
 	void drawUI_bottom(int x, int y);
 	void drawUI_top(int x, int y);
 	void target(int x, int y);
+	void flatten();
 
 	friend class Level;
 	friend class Team;

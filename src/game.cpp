@@ -9,6 +9,7 @@
 
 Game::Game(const char *filename) {
 	level.load(filename);
+	sidebar.team = &level.teams.at(level.playerTeam);
 	sidebar.rebuild();
 	oldX = 0;
 	oldY = 0;
@@ -92,12 +93,13 @@ void Game::draw() {
 	SDL_RenderClear(renderer);
 
 	level.map.draw(-cameraX, -cameraY);
+	level.drawUnits_bottom(-cameraX, -cameraY);
 	
 	for(int i = 0; i < selectedUnits.size(); i++)
 		if(selectedUnits.at(i))
 			selectedUnits.at(i)->drawUI_bottom(-cameraX, -cameraY);
 
-	level.drawUnits(-cameraX, -cameraY);
+	level.drawUnits_top(-cameraX, -cameraY);
 
 	if(drag && mousedown && (btn & SDL_BUTTON_LMASK))
 		drawSelectRect();
@@ -151,6 +153,23 @@ void Game::keyUp(SDL_Keycode sym) {
 	}
 }
 
+void Game::selectUnits() {
+	SDL_Rect r = getSelectRect();
+
+	selectedUnits.clear();
+
+	for(int tx = r.x/24; tx <= r.x/24+r.w/24; tx++)
+		for(int ty = r.y/24; ty <= r.y/24+r.h/24; ty++) {
+			Unit *u = level.unitAt(tx, ty);
+			if(u) {
+				for(int i = 0; i < selectedUnits.size(); i++)
+					if(selectedUnits.at(i) == u)
+						continue;
+				selectedUnits.push_back(u);
+			}
+		}
+}
+
 void Game::click() {
 	int x, y;
 	getMouseXY(&x, &y);
@@ -158,23 +177,8 @@ void Game::click() {
 	int xd = x-oldX, yd = y-oldY;
 
 	if(drag) {
-		if(btn & SDL_BUTTON_LMASK) {
-			SDL_Rect r = getSelectRect();
-
-			selectedUnits.clear();
-
-			for(int tx = r.x/24; tx <= r.x/24+r.w/24; tx++)
-				for(int ty = r.y/24; ty <= r.y/24+r.h/24; ty++) {
-					Unit *u = level.unitAt(tx, ty);
-					if(u)
-						selectedUnits.push_back(u);
-				}
-		}
-
-		/*if(btn & SDL_BUTTON_RMASK) {
-			cameraX = oldCamX+xd;
-			cameraY = oldCamY+yd;
-		}*/
+		if(btn & SDL_BUTTON_LMASK)
+			selectUnits();
 
 		return;
 	}

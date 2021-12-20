@@ -2,7 +2,7 @@
 CC = g++
 OUTPUT = stipula
 
-$(OUTPUT): obj/cursor.o obj/drawText.o obj/game.o obj/initSDL.o obj/level.o obj/loadTextures.o obj/main.o obj/map.o obj/sidebar.o obj/unit.o
+$(OUTPUT): obj/cursor.o obj/drawText.o obj/game.o obj/initSDL.o obj/level.o obj/loadTextures.o obj/main.o obj/map.o obj/sidebar.o obj/team.o obj/unit.o
 	$(CC) obj/* -Iinclude -o $(OUTPUT) -lSDL2
 
 obj/cursor.o: src/cursor.cpp include/initSDL.hpp include/loadTextures.hpp include/cursor.hpp
@@ -23,6 +23,8 @@ obj/map.o: src/map.cpp include/loadTextures.hpp include/initSDL.hpp include/map.
 	$(CC) -c src/map.cpp -Iinclude -o obj/map.o
 obj/sidebar.o: src/sidebar.cpp include/initSDL.hpp include/loadTextures.hpp include/unit.hpp include/drawText.hpp include/sidebar.hpp
 	$(CC) -c src/sidebar.cpp -Iinclude -o obj/sidebar.o
+obj/team.o: src/team.cpp include/level.hpp include/unit.hpp include/team.hpp
+	$(CC) -c src/team.cpp -Iinclude -o obj/team.o
 obj/unit.o: src/unit.cpp include/initSDL.hpp include/loadTextures.hpp include/level.hpp include/unit.hpp
 	$(CC) -c src/unit.cpp -Iinclude -o obj/unit.o
 

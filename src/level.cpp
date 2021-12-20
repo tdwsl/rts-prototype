@@ -6,16 +6,21 @@
 #include "initSDL.hpp"
 #include "unit.hpp"
 #include "map.hpp"
+#include "team.hpp"
 #include "level.hpp"
 
 void Level::addUnit(int x, int y, int type, int team) {
 	Unit u(this, x, y, type, team);
+	if(u.fixed)
+		u.flatten();
 	units.push_back(u);
 }
 
 Unit *Level::unitAt(int x, int y) {
 	for(int i = 0; i < units.size(); i++)
-		if(units.at(i).x == x && units.at(i).y == y)
+		if(x >= units.at(i).x && y >= units.at(i).y &&
+				x < units.at(i).x+units.at(i).w &&
+				y < units.at(i).y+units.at(i).h)
 			return &units.at(i);
 	return 0;
 }
@@ -30,9 +35,16 @@ void Level::update(int diff) {
 	}
 }
 
-void Level::drawUnits(int x, int y) {
+void Level::drawUnits_bottom(int x, int y) {
 	for(int i = 0; i < units.size(); i++)
-		units.at(i).draw(x, y);
+		if(units.at(i).fixed)
+			units.at(i).draw(x, y);
+}
+
+void Level::drawUnits_top(int x, int y) {
+	for(int i = 0; i < units.size(); i++)
+		if(!units.at(i).fixed)
+			units.at(i).draw(x, y);
 }
 
 void Level::load(const char *filename) {
@@ -45,6 +57,9 @@ void Level::load(const char *filename) {
 
 	map.load(mapfn);
 
+	int hiteam = 0;
+	playerTeam = 0;
+
 	FILE *fp = fopen(unitfn, "r");
 	assert(fp);
 	int n;
@@ -53,15 +68,22 @@ void Level::load(const char *filename) {
 		int x, y, type, team;
 		float hp;
 		fscanf(fp, "%d%d%d%d%f", &x, &y, &type, &team, &hp);
-		Unit u(this, x, y, type, team);
+		if(team > hiteam)
+			hiteam = team;
+		addUnit(x, y, type, team);
 		if(hp >= 0)
-			u.hp = hp;
-		units.push_back(u);
+			units.front().hp = hp;
 	}
 	fclose(fp);
 
 	free(unitfn);
 	free(mapfn);
+
+	teams.clear();
+	for(int i = 0; i <= hiteam; i++) {
+		Team t(this, i, 0, 0, 0);
+		teams.push_back(t);
+	}
 }
 
 void Level::save(const char *filename) {
@@ -97,7 +119,21 @@ Map Level::generatePathmap(int x1, int y1, int x2, int y2) {
 
 	for(int i = 0; i < units.size(); i++)
 		m.setTile(units.at(i).x, units.at(i).y, -1);
-	m.setTile(x2, y2, 0);
+
+	if(m.getTile(x2, y2))
+		if(!unitAt(x2, y2)->fixed)
+			m.setTile(x2, y2, 0);
+
+	for(int i = 0; i < units.size(); i++) {
+		int sx1 = units.at(i).x, sy1 = units.at(i).y;
+		int sx2 = units.at(i).x+units.at(i).w;
+		int sy2 = units.at(i).y+units.at(i).h;
+
+		for(int x = sx1; x < sx2; x++)
+			for(int y = sy1; y < sy2; y++)
+				if(x != sx1 || y != sy1)
+					m.setTile(x, y, -1);
+	}
 
 	m.setTile(x1, y1, 1);
 
