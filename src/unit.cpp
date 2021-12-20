@@ -32,6 +32,8 @@ Unit::Unit(Level *level, int x, int y, int type, int team) {
 
 	fixed = false;
 	regen = 0;
+	power = 0;
+	disabled = false;
 
 	switch(type) {
 		case UNITTYPE_SOLDIER:

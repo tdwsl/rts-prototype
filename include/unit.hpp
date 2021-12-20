@@ -27,6 +27,8 @@ class Unit {
 	Level *level;
 	bool fixed;
 	int targetX, targetY, targetMode;
+	int power;
+	bool disabled;
 
 	bool moving();
 	SDL_Rect destRect(int x, int y);
@@ -41,6 +43,7 @@ public:
 	void target(int x, int y);
 
 	friend class Level;
+	friend class Team;
 };
 
 #endif
