@@ -106,7 +106,7 @@ Unit::Unit(Level *level, int x, int y, int type, int team) {
 void Unit::flatten() {
 	for(int sx = x; sx < x+w; sx++)
 		for(int sy = y; sy < y+h; sy++)
-			level->map.setTile(sx, sy, 13);
+			level->map.setTile(sx, sy, 14);
 }
 
 bool Unit::moving() {
@@ -219,7 +219,7 @@ void Unit::update(int diff) {
 			navTo(targetX, targetY);
 	}
 	else if(targetMode == 2) {
-		navTo(targetUnit->x, targetUnit->y);
+		navTo(targetUnit->px, targetUnit->py);
 	}
 }
 
